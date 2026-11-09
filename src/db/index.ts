@@ -3,8 +3,15 @@ import { drizzle } from "drizzle-orm/sqlite-proxy";
 import * as schema from "./schema";
 import { existsSync, mkdirSync } from "fs";
 import { join } from "path";
+import { autoInitDatabase } from "./init";
 
-const dataDir = join(process.cwd(), "data");
+// In Vercel / serverless environment, the root filesystem is read-only.
+// Use /tmp for writable SQLite operations.
+const isServerless =
+  process.env.VERCEL === "1" || !!process.env.AWS_LAMBDA_FUNCTION_NAME;
+
+const dataDir = isServerless ? "/tmp" : join(process.cwd(), "data");
+
 if (!existsSync(dataDir)) {
   mkdirSync(dataDir, { recursive: true });
 }
@@ -13,6 +20,9 @@ const dbPath = join(dataDir, "inventory.db");
 const sqlite = new DatabaseSync(dbPath);
 sqlite.exec("PRAGMA journal_mode = WAL;");
 sqlite.exec("PRAGMA foreign_keys = ON;");
+
+// Ensure tables and seed demo data are initialized
+autoInitDatabase(sqlite);
 
 export const db = drizzle(
   async (sql, params, method) => {
