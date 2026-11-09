@@ -156,28 +156,31 @@ export default async function ProductsPage({
                       <td className="py-3 px-4 text-slate-900">
                         {prod.price ? formatCurrency(prod.price) : "-"}
                       </td>
-                      <td className="py-3 px-4">
+                      <td className="py-3.5 px-4">
                         {isOut ? (
-                          <span className="inline-block px-2 py-0.5 text-xs font-bold rounded bg-red-100 text-red-800 border border-red-200">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-full bg-rose-50 text-rose-700 border border-rose-200/80">
+                            <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
                             Habis
                           </span>
                         ) : isLow ? (
-                          <span className="inline-block px-2 py-0.5 text-xs font-bold rounded bg-amber-100 text-amber-800 border border-amber-200">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-full bg-amber-50 text-amber-700 border border-amber-200/80">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                             Menipis
                           </span>
                         ) : (
-                          <span className="inline-block px-2 py-0.5 text-xs font-bold rounded bg-emerald-100 text-emerald-800 border border-emerald-200">
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/80">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                             Aman
                           </span>
                         )}
                       </td>
                       {canEdit && (
-                        <td className="py-3 px-4 text-right">
-                          <div className="flex items-center justify-end gap-2">
+                        <td className="py-3.5 px-4 text-right">
+                          <div className="flex items-center justify-end gap-1.5">
                             <Link
                               href={`/products/${prod.id}/edit`}
-                              className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded transition"
-                              title="Edit"
+                              className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                              title="Edit Data Produk"
                             >
                               <Edit2 className="w-4 h-4" />
                             </Link>
@@ -187,8 +190,8 @@ export default async function ProductsPage({
                               >
                                 <button
                                   type="submit"
-                                  className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition cursor-pointer"
-                                  title="Hapus"
+                                  className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition cursor-pointer"
+                                  title="Arsipkan / Hapus"
                                 >
                                   <Trash2 className="w-4 h-4" />
                                 </button>

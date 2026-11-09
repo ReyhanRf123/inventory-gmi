@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth/session";
 import { Sidebar } from "@/components/sidebar";
+import { ShieldCheck } from "lucide-react";
 
 export default async function DashboardLayout({
   children,
@@ -14,31 +15,43 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
+    <div className="flex min-h-screen bg-slate-50/70">
       <Sidebar session={session} />
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-16 bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-10">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-slate-500">
+        <header className="h-16 glass-panel sticky top-0 z-20 px-8 flex items-center justify-between border-b border-slate-200/80 shadow-xs">
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-semibold text-slate-700">
               Gudang Pusat Medika Square
             </span>
             <span className="text-slate-300">•</span>
-            <span className="text-xs px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 font-medium border border-emerald-200">
-              Operasional Normal
+            <span className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 font-semibold border border-emerald-200/80 shadow-xs">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+              </span>
+              Sistem Aktif (Realtime)
             </span>
           </div>
-          <div className="text-right">
-            <p className="text-xs text-slate-400">
-              {new Date().toLocaleDateString("id-ID", {
-                weekday: "long",
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              })}
-            </p>
+
+          <div className="flex items-center gap-4">
+            <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-500 bg-slate-100/80 px-2.5 py-1 rounded-lg border border-slate-200/60 font-mono">
+              <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
+              <span>WAL Mode • Zero-Config</span>
+            </div>
+            <div className="text-right">
+              <p className="text-xs font-medium text-slate-500 capitalize">
+                {new Date().toLocaleDateString("id-ID", {
+                  weekday: "long",
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                })}
+              </p>
+            </div>
           </div>
         </header>
-        <main className="flex-1 p-8 overflow-y-auto">{children}</main>
+
+        <main className="flex-1 p-6 lg:p-8 overflow-y-auto">{children}</main>
       </div>
     </div>
   );

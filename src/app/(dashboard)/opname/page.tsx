@@ -67,7 +67,7 @@ export default async function OpnamePage() {
             return (
               <div
                 key={op.id}
-                className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-4"
+                className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-6 space-y-4"
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
                   <div className="flex items-center gap-3">
