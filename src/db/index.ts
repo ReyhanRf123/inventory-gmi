@@ -22,21 +22,33 @@ let sqliteInstance: DatabaseSync | null = null;
 export function getDb(): AppDb {
   if (_cachedDb) return _cachedDb;
 
-  const rawTursoUrl =
-    process.env.TURSO_DATABASE_URL ||
-    process.env.TURSO_DB_URL ||
-    process.env.DATABASE_URL;
+  const envKeys = Object.keys(process.env);
 
-  const rawTursoAuthToken =
-    process.env.TURSO_AUTH_TOKEN ||
-    process.env.TURSO_TOKEN;
+  const foundUrlKey = envKeys.find((k) => {
+    const upper = k.toUpperCase();
+    return (
+      ["TURSO_DATABASE_URL", "TURSO_URL", "TURSO_DB_URL", "DATABASE_URL", "LIBSQL_URL", "TURSO_URI"].includes(upper) ||
+      (upper.includes("TURSO") && (upper.includes("URL") || upper.includes("URI") || upper.includes("DB")))
+    );
+  });
+
+  const foundTokenKey = envKeys.find((k) => {
+    const upper = k.toUpperCase();
+    return (
+      ["TURSO_AUTH_TOKEN", "TURSO_TOKEN", "TURSO_KEY", "AUTH_TOKEN"].includes(upper) ||
+      (upper.includes("TURSO") && (upper.includes("TOKEN") || upper.includes("KEY") || upper.includes("AUTH")))
+    );
+  });
+
+  const rawTursoUrl = foundUrlKey ? process.env[foundUrlKey] : undefined;
+  const rawTursoAuthToken = foundTokenKey ? process.env[foundTokenKey] : undefined;
 
   const tursoUrl = rawTursoUrl?.trim().replace(/^["']|["']$/g, "");
   const tursoAuthToken = rawTursoAuthToken?.trim().replace(/^["']|["']$/g, "");
 
   if (tursoUrl) {
     // Remote Mode: Turso Cloud Database (LibSQL)
-    console.log("🌐 [DB] Menginisialisasi Turso Cloud Client:", tursoUrl.split("@").pop());
+    console.log(`🌐 [DB] Menginisialisasi Turso Client dari env '${foundUrlKey}':`, tursoUrl.split("@").pop());
     const client = createClient({
       url: tursoUrl,
       authToken: tursoAuthToken,
