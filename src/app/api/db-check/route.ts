@@ -46,7 +46,7 @@ export async function GET() {
         tokenFound: isTokenSet,
       },
       productsCount: list.length,
-      sampleProducts: list.map((p) => `${p.code}: ${p.name} (Stok: ${p.currentStock})`),
+      sampleProducts: list.map((p: { code: string; name: string; currentStock: number | null }) => `${p.code}: ${p.name} (Stok: ${p.currentStock})`),
       diagnosis: isTursoSet
         ? "✅ Terhubung ke Turso Cloud. Data tersimpan permanen."
         : "⚠️ PERINGATAN: TURSO_DATABASE_URL belum terbaca di Vercel. Data masih di-save ke /tmp dan akan hilang saat refresh. Pastikan tambah env var di Vercel lalu REDEPLOY.",

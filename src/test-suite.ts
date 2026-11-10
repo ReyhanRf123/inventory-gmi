@@ -32,6 +32,22 @@ async function runTests() {
   console.log("  INVENTORI GMI — INTEGRATION & FUNCTIONAL TESTS");
   console.log("==================================================\n");
 
+  // Pre-clean any leftover test products from previous runs
+  try {
+    const existing = await db.query.products.findFirst({ where: eq(products.code, "TEST-PROD-01") });
+    if (existing) {
+      await db.delete(stockOpnameItems).where(eq(stockOpnameItems.productId, existing.id));
+      await db.delete(stockOut).where(eq(stockOut.productId, existing.id));
+      await db.delete(stockIn).where(eq(stockIn.productId, existing.id));
+      await db.delete(products).where(eq(products.id, existing.id));
+    }
+    const existingCat = await db.query.products.findFirst({ where: eq(products.code, "TEST-CAT-01") });
+    if (existingCat) {
+      await db.delete(products).where(eq(products.id, existingCat.id));
+    }
+    await db.delete(categories).where(eq(categories.name, "Kategori Uji Proteksi"));
+  } catch {}
+
   // 1. Session & Auth JWT
   console.log("1. Pengujian Autentikasi & Session JWT");
   const payload = {
@@ -148,11 +164,13 @@ async function runTests() {
   assert(difference === -3, "Selisih opname tercatat akurat (-3)");
 
   // Clean up test data
-  sqlite?.exec(`DELETE FROM stock_opname_items WHERE opname_id = '${opnameHeader.id}';`);
-  sqlite?.exec(`DELETE FROM stock_opname WHERE id = '${opnameHeader.id}';`);
-  sqlite?.exec(`DELETE FROM stock_out WHERE product_id = '${testProduct.id}';`);
-  sqlite?.exec(`DELETE FROM stock_in WHERE product_id = '${testProduct.id}';`);
-  sqlite?.exec(`DELETE FROM products WHERE id = '${testProduct.id}';`);
+  try {
+    await db.delete(stockOpnameItems).where(eq(stockOpnameItems.opnameId, opnameHeader.id));
+    await db.delete(stockOpname).where(eq(stockOpname.id, opnameHeader.id));
+    await db.delete(stockOut).where(eq(stockOut.productId, testProduct.id));
+    await db.delete(stockIn).where(eq(stockIn.productId, testProduct.id));
+    await db.delete(products).where(eq(products.id, testProduct.id));
+  } catch {}
   console.log("  🧹 Data pengujian sementara telah dibersihkan.");
 
   // 5. Foreign Key Protection Test
@@ -169,8 +187,10 @@ async function runTests() {
   assert(inUseCheck !== undefined, "Proteksi mendeteksi kategori sedang digunakan oleh produk aktif");
 
   // Clean up
-  sqlite?.exec(`DELETE FROM products WHERE id = '${testProdCat.id}';`);
-  sqlite?.exec(`DELETE FROM categories WHERE id = '${testCat.id}';`);
+  try {
+    await db.delete(products).where(eq(products.id, testProdCat.id));
+    await db.delete(categories).where(eq(categories.id, testCat.id));
+  } catch {}
 
   console.log("\n==================================================");
   console.log(`HASIL TEST: ${testsPassed} Berhasil, ${testsFailed} Gagal`);

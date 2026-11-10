@@ -1,4 +1,4 @@
-import { drizzle as drizzleLibsql } from "drizzle-orm/libsql";
+import { drizzle as drizzleLibsql, type LibSQLDatabase } from "drizzle-orm/libsql";
 import { drizzle as drizzleProxy } from "drizzle-orm/sqlite-proxy";
 import { createClient } from "@libsql/client";
 import { DatabaseSync } from "node:sqlite";
@@ -7,6 +7,8 @@ import { existsSync, mkdirSync } from "fs";
 import { join } from "path";
 import { autoInitDatabase } from "./init";
 
+export type AppDb = LibSQLDatabase<typeof schema>;
+
 // Load .env.local if present (useful for CLI/scripts like tsx seed.ts)
 if (typeof process.loadEnvFile === "function") {
   try {
@@ -14,10 +16,10 @@ if (typeof process.loadEnvFile === "function") {
   } catch {}
 }
 
-let _cachedDb: any = null;
+let _cachedDb: AppDb | null = null;
 let sqliteInstance: DatabaseSync | null = null;
 
-export function getDb() {
+export function getDb(): AppDb {
   if (_cachedDb) return _cachedDb;
 
   const rawTursoUrl =
@@ -39,7 +41,7 @@ export function getDb() {
       url: tursoUrl,
       authToken: tursoAuthToken,
     });
-    _cachedDb = drizzleLibsql(client, { schema });
+    _cachedDb = drizzleLibsql(client, { schema }) as AppDb;
     return _cachedDb;
   }
 
@@ -88,16 +90,16 @@ export function getDb() {
       }
     },
     { schema }
-  );
+  ) as unknown as AppDb;
 
   return _cachedDb;
 }
 
-// Proxied db instance: delegates all queries dynamically at runtime
-export const db: ReturnType<typeof getDb> = new Proxy({} as any, {
+// Proxied db instance: delegates all queries dynamically at runtime with strict type inference
+export const db: AppDb = new Proxy({} as any, {
   get(_target, prop) {
     const instance = getDb();
-    const val = instance[prop];
+    const val = (instance as any)[prop];
     if (typeof val === "function") {
       return val.bind(instance);
     }
