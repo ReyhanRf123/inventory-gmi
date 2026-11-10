@@ -7,6 +7,13 @@ import { existsSync, mkdirSync } from "fs";
 import { join } from "path";
 import { autoInitDatabase } from "./init";
 
+// Load .env.local if present (useful for CLI/scripts like tsx seed.ts)
+if (typeof process.loadEnvFile === "function") {
+  try {
+    process.loadEnvFile(".env.local");
+  } catch {}
+}
+
 const tursoUrl = process.env.TURSO_DATABASE_URL;
 const tursoAuthToken = process.env.TURSO_AUTH_TOKEN;
 
