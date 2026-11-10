@@ -1,4 +1,4 @@
-import { eq, count } from "drizzle-orm";
+import { eq, count, sql } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { db, sqlite } from "./index";
 import {
@@ -12,6 +12,7 @@ import {
 } from "./schema";
 
 function initTables() {
+  if (!sqlite) return;
   sqlite.exec(`
     CREATE TABLE IF NOT EXISTS users (
       id TEXT PRIMARY KEY,
@@ -122,17 +123,34 @@ async function seed() {
   const isReset = process.argv.includes("--reset");
   if (isReset) {
     console.log("🧹 Mereset data tabel ke kondisi awal...");
-    sqlite.exec(`
-      DELETE FROM stock_opname_items;
-      DELETE FROM stock_opname;
-      DELETE FROM stock_out;
-      DELETE FROM stock_in;
-      DELETE FROM products;
-      DELETE FROM categories;
-      DELETE FROM units;
-      DELETE FROM users;
-      DELETE FROM company_settings;
-    `);
+    if (sqlite) {
+      sqlite.exec(`
+        DELETE FROM stock_opname_items;
+        DELETE FROM stock_opname;
+        DELETE FROM stock_out;
+        DELETE FROM stock_in;
+        DELETE FROM products;
+        DELETE FROM categories;
+        DELETE FROM units;
+        DELETE FROM users;
+        DELETE FROM company_settings;
+      `);
+    } else {
+      const tables = [
+        "stock_opname_items",
+        "stock_opname",
+        "stock_out",
+        "stock_in",
+        "products",
+        "categories",
+        "units",
+        "users",
+        "company_settings",
+      ];
+      for (const t of tables) {
+        await db.run(sql.raw(`DELETE FROM ${t};`));
+      }
+    }
   }
   console.log("✅ Tabel siap.\n");
 

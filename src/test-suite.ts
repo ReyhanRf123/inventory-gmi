@@ -148,11 +148,11 @@ async function runTests() {
   assert(difference === -3, "Selisih opname tercatat akurat (-3)");
 
   // Clean up test data
-  sqlite.exec(`DELETE FROM stock_opname_items WHERE opname_id = '${opnameHeader.id}';`);
-  sqlite.exec(`DELETE FROM stock_opname WHERE id = '${opnameHeader.id}';`);
-  sqlite.exec(`DELETE FROM stock_out WHERE product_id = '${testProduct.id}';`);
-  sqlite.exec(`DELETE FROM stock_in WHERE product_id = '${testProduct.id}';`);
-  sqlite.exec(`DELETE FROM products WHERE id = '${testProduct.id}';`);
+  sqlite?.exec(`DELETE FROM stock_opname_items WHERE opname_id = '${opnameHeader.id}';`);
+  sqlite?.exec(`DELETE FROM stock_opname WHERE id = '${opnameHeader.id}';`);
+  sqlite?.exec(`DELETE FROM stock_out WHERE product_id = '${testProduct.id}';`);
+  sqlite?.exec(`DELETE FROM stock_in WHERE product_id = '${testProduct.id}';`);
+  sqlite?.exec(`DELETE FROM products WHERE id = '${testProduct.id}';`);
   console.log("  🧹 Data pengujian sementara telah dibersihkan.");
 
   // 5. Foreign Key Protection Test
@@ -169,8 +169,8 @@ async function runTests() {
   assert(inUseCheck !== undefined, "Proteksi mendeteksi kategori sedang digunakan oleh produk aktif");
 
   // Clean up
-  sqlite.exec(`DELETE FROM products WHERE id = '${testProdCat.id}';`);
-  sqlite.exec(`DELETE FROM categories WHERE id = '${testCat.id}';`);
+  sqlite?.exec(`DELETE FROM products WHERE id = '${testProdCat.id}';`);
+  sqlite?.exec(`DELETE FROM categories WHERE id = '${testCat.id}';`);
 
   console.log("\n==================================================");
   console.log(`HASIL TEST: ${testsPassed} Berhasil, ${testsFailed} Gagal`);
