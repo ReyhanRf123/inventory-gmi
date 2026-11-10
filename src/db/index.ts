@@ -14,14 +14,24 @@ if (typeof process.loadEnvFile === "function") {
   } catch {}
 }
 
-const tursoUrl = process.env.TURSO_DATABASE_URL;
-const tursoAuthToken = process.env.TURSO_AUTH_TOKEN;
+const rawTursoUrl =
+  process.env.TURSO_DATABASE_URL ||
+  process.env.TURSO_DB_URL ||
+  process.env.DATABASE_URL;
+
+const rawTursoAuthToken =
+  process.env.TURSO_AUTH_TOKEN ||
+  process.env.TURSO_TOKEN;
+
+const tursoUrl = rawTursoUrl?.trim().replace(/^["']|["']$/g, "");
+const tursoAuthToken = rawTursoAuthToken?.trim().replace(/^["']|["']$/g, "");
 
 let sqliteInstance: DatabaseSync | null = null;
 
 function createDb() {
   if (tursoUrl) {
     // Remote Mode: Turso Cloud Database (LibSQL)
+    console.log("🌐 [DB] Terhubung ke Turso Cloud Database:", tursoUrl.split("@").pop());
     const client = createClient({
       url: tursoUrl,
       authToken: tursoAuthToken,
@@ -32,6 +42,15 @@ function createDb() {
   // Local / Fallback Mode: SQLite via node:sqlite
   const isServerless =
     process.env.VERCEL === "1" || !!process.env.AWS_LAMBDA_FUNCTION_NAME;
+
+  if (isServerless) {
+    console.warn(
+      "⚠️ [DB WARNING] Berjalan di Vercel/Serverless TANPA TURSO_DATABASE_URL!\n" +
+      "Data disimpan sementara di /tmp dan AKAN HILANG saat instance restart/refresh.\n" +
+      "Pastikan variabel TURSO_DATABASE_URL dan TURSO_AUTH_TOKEN sudah ditambahkan di Vercel Settings -> Environment Variables, lalu klik REDEPLOY."
+    );
+  }
+
   const dataDir = isServerless ? "/tmp" : join(process.cwd(), "data");
 
   if (!existsSync(dataDir)) {

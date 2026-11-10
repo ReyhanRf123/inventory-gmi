@@ -34,10 +34,21 @@ export default async function DashboardLayout({
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-500 bg-slate-100/80 px-2.5 py-1 rounded-lg border border-slate-200/60 font-mono">
-              <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
-              <span>WAL Mode • Zero-Config</span>
-            </div>
+            {Boolean(process.env.TURSO_DATABASE_URL || process.env.DATABASE_URL) ? (
+              <div className="hidden sm:flex items-center gap-1.5 text-xs text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200/80 font-mono shadow-2xs">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Turso Cloud • Persisten</span>
+              </div>
+            ) : process.env.VERCEL === "1" ? (
+              <div className="hidden sm:flex items-center gap-1.5 text-xs text-amber-700 bg-amber-50 px-2.5 py-1 rounded-lg border border-amber-300 font-mono animate-pulse">
+                <span>⚠️ DB Temp (/tmp) • Butuh Redeploy</span>
+              </div>
+            ) : (
+              <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-500 bg-slate-100/80 px-2.5 py-1 rounded-lg border border-slate-200/60 font-mono">
+                <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
+                <span>SQLite Lokal • WAL Mode</span>
+              </div>
+            )}
             <div className="text-right">
               <p className="text-xs font-medium text-slate-500 capitalize">
                 {new Date().toLocaleDateString("id-ID", {
