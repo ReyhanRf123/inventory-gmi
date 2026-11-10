@@ -14,29 +14,33 @@ if (typeof process.loadEnvFile === "function") {
   } catch {}
 }
 
-const rawTursoUrl =
-  process.env.TURSO_DATABASE_URL ||
-  process.env.TURSO_DB_URL ||
-  process.env.DATABASE_URL;
-
-const rawTursoAuthToken =
-  process.env.TURSO_AUTH_TOKEN ||
-  process.env.TURSO_TOKEN;
-
-const tursoUrl = rawTursoUrl?.trim().replace(/^["']|["']$/g, "");
-const tursoAuthToken = rawTursoAuthToken?.trim().replace(/^["']|["']$/g, "");
-
+let _cachedDb: any = null;
 let sqliteInstance: DatabaseSync | null = null;
 
-function createDb() {
+export function getDb() {
+  if (_cachedDb) return _cachedDb;
+
+  const rawTursoUrl =
+    process.env.TURSO_DATABASE_URL ||
+    process.env.TURSO_DB_URL ||
+    process.env.DATABASE_URL;
+
+  const rawTursoAuthToken =
+    process.env.TURSO_AUTH_TOKEN ||
+    process.env.TURSO_TOKEN;
+
+  const tursoUrl = rawTursoUrl?.trim().replace(/^["']|["']$/g, "");
+  const tursoAuthToken = rawTursoAuthToken?.trim().replace(/^["']|["']$/g, "");
+
   if (tursoUrl) {
     // Remote Mode: Turso Cloud Database (LibSQL)
-    console.log("🌐 [DB] Terhubung ke Turso Cloud Database:", tursoUrl.split("@").pop());
+    console.log("🌐 [DB] Menginisialisasi Turso Cloud Client:", tursoUrl.split("@").pop());
     const client = createClient({
       url: tursoUrl,
       authToken: tursoAuthToken,
     });
-    return drizzleLibsql(client, { schema });
+    _cachedDb = drizzleLibsql(client, { schema });
+    return _cachedDb;
   }
 
   // Local / Fallback Mode: SQLite via node:sqlite
@@ -64,7 +68,7 @@ function createDb() {
 
   autoInitDatabase(sqliteInstance);
 
-  return drizzleProxy(
+  _cachedDb = drizzleProxy(
     async (sql, params, method) => {
       try {
         const stmt = sqliteInstance!.prepare(sql);
@@ -85,9 +89,22 @@ function createDb() {
     },
     { schema }
   );
+
+  return _cachedDb;
 }
 
-export const db = createDb();
+// Proxied db instance: delegates all queries dynamically at runtime
+export const db: ReturnType<typeof getDb> = new Proxy({} as any, {
+  get(_target, prop) {
+    const instance = getDb();
+    const val = instance[prop];
+    if (typeof val === "function") {
+      return val.bind(instance);
+    }
+    return val;
+  },
+});
+
 export { sqliteInstance as sqlite };
 
 
