@@ -7,7 +7,14 @@ import { ArrowLeft } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
-export default async function NewStockOutPage() {
+export default async function NewStockOutPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ error?: string }>;
+}) {
+  const resolvedParams = searchParams ? await searchParams : {};
+  const errorMsg = resolvedParams.error;
+
   // Only show products with currentStock > 0
   const availableProducts = await db
     .select()
@@ -34,6 +41,12 @@ export default async function NewStockOutPage() {
           </p>
         </div>
       </div>
+
+      {errorMsg && (
+        <div className="p-4 bg-rose-50 border border-rose-200 text-rose-700 text-sm rounded-xl font-medium shadow-2xs">
+          ⚠️ {errorMsg}
+        </div>
+      )}
 
       <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm">
         <form action={createStockOutAction} className="space-y-4">

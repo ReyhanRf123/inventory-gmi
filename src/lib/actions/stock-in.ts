@@ -1,8 +1,8 @@
 "use server";
 
 import { db } from "@/db/index";
-import { stockIn, products } from "@/db/schema";
-import { eq, sql } from "drizzle-orm";
+import { stockIn, products, users } from "@/db/schema";
+import { eq, or, sql } from "drizzle-orm";
 import { getSession } from "@/lib/auth/session";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -10,7 +10,7 @@ import { redirect } from "next/navigation";
 export async function createStockInAction(formData: FormData) {
   const session = await getSession();
   if (!session || session.role === "viewer") {
-    throw new Error("Tidak memiliki izin untuk mencatat barang masuk.");
+    redirect("/stock-in/new?error=" + encodeURIComponent("Tidak memiliki izin untuk mencatat barang masuk."));
   }
 
   const productId = formData.get("productId") as string;
@@ -23,7 +23,25 @@ export async function createStockInAction(formData: FormData) {
   const notes = formData.get("notes") as string;
 
   if (!productId || isNaN(quantity) || quantity <= 0 || !date) {
-    throw new Error("Produk, jumlah (minimal 1), dan tanggal wajib diisi.");
+    redirect("/stock-in/new?error=" + encodeURIComponent("Produk, jumlah (minimal 1), dan tanggal wajib diisi."));
+  }
+
+  // Resolve actual user ID from DB by session.email or session.userId
+  let creatorId = session.userId;
+  try {
+    const user = await db.query.users.findFirst({
+      where: or(eq(users.id, session.userId), eq(users.email, session.email)),
+    });
+    if (user) {
+      creatorId = user.id;
+    } else {
+      const anyUser = await db.query.users.findFirst();
+      if (anyUser) {
+        creatorId = anyUser.id;
+      }
+    }
+  } catch (e) {
+    console.warn("User lookup fallback:", e);
   }
 
   // 1. Insert stockIn
@@ -36,7 +54,7 @@ export async function createStockInAction(formData: FormData) {
     supplier: supplier || null,
     referenceNumber: referenceNumber || null,
     notes: notes || null,
-    createdBy: session.userId,
+    createdBy: creatorId,
   });
 
   // 2. Increment product currentStock

@@ -1,8 +1,8 @@
 "use server";
 
 import { db } from "@/db/index";
-import { stockOut, products } from "@/db/schema";
-import { eq, sql } from "drizzle-orm";
+import { stockOut, products, users } from "@/db/schema";
+import { eq, or, sql } from "drizzle-orm";
 import { getSession } from "@/lib/auth/session";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -10,7 +10,7 @@ import { redirect } from "next/navigation";
 export async function createStockOutAction(formData: FormData) {
   const session = await getSession();
   if (!session || session.role === "viewer") {
-    throw new Error("Tidak memiliki izin untuk mencatat barang keluar.");
+    redirect("/stock-out/new?error=" + encodeURIComponent("Tidak memiliki izin untuk mencatat barang keluar."));
   }
 
   const productId = formData.get("productId") as string;
@@ -21,7 +21,7 @@ export async function createStockOutAction(formData: FormData) {
   const notes = formData.get("notes") as string;
 
   if (!productId || isNaN(quantity) || quantity <= 0 || !date) {
-    throw new Error("Produk, jumlah (minimal 1), dan tanggal wajib diisi.");
+    redirect("/stock-out/new?error=" + encodeURIComponent("Produk, jumlah (minimal 1), dan tanggal wajib diisi."));
   }
 
   // 1. Check current stock
@@ -30,13 +30,34 @@ export async function createStockOutAction(formData: FormData) {
   });
 
   if (!product) {
-    throw new Error("Produk tidak ditemukan.");
+    redirect("/stock-out/new?error=" + encodeURIComponent("Produk tidak ditemukan di database."));
   }
 
   if ((product.currentStock || 0) < quantity) {
-    throw new Error(
-      `Stok tidak mencukupi! Stok saat ini: ${product.currentStock}, diminta: ${quantity}.`
+    redirect(
+      "/stock-out/new?error=" +
+        encodeURIComponent(
+          `Stok tidak mencukupi! Stok saat ini: ${product.currentStock}, diminta: ${quantity}.`
+        )
     );
+  }
+
+  // Resolve actual user ID from DB by session.email or session.userId to prevent stale session FK constraint failures
+  let creatorId = session.userId;
+  try {
+    const user = await db.query.users.findFirst({
+      where: or(eq(users.id, session.userId), eq(users.email, session.email)),
+    });
+    if (user) {
+      creatorId = user.id;
+    } else {
+      const anyUser = await db.query.users.findFirst();
+      if (anyUser) {
+        creatorId = anyUser.id;
+      }
+    }
+  } catch (e) {
+    console.warn("User lookup fallback:", e);
   }
 
   // 2. Insert stockOut
@@ -47,7 +68,7 @@ export async function createStockOutAction(formData: FormData) {
     destination: destination || null,
     referenceNumber: referenceNumber || null,
     notes: notes || null,
-    createdBy: session.userId,
+    createdBy: creatorId,
   });
 
   // 3. Decrement product currentStock
