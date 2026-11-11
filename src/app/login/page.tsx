@@ -6,8 +6,8 @@ import { Package, Lock, Mail, AlertCircle, Loader2, Sparkles, UserCheck } from "
 
 export default function LoginPage() {
   const [state, formAction, isPending] = useActionState(loginAction, undefined);
-  const [email, setEmail] = useState("gudang@globalmedika.co.id");
-  const [password, setPassword] = useState("Inventori2026!");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleSelectDemo = (demoEmail: string) => {
     setEmail(demoEmail);
@@ -104,15 +104,12 @@ export default function LoginPage() {
           </button>
         </form>
 
-        {/* Demo Fast Login Switcher */}
+        {/* Role Selector */}
         <div className="mt-8 pt-5 border-t border-slate-200/80">
           <div className="flex items-center justify-between mb-2.5">
             <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-              Pilih Cepat Akun Demo:
+              Role
             </p>
-            <span className="text-[11px] font-mono text-slate-400">
-              Pwd: Inventori2026!
-            </span>
           </div>
 
           <div className="grid grid-cols-3 gap-2">
