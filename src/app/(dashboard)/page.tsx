@@ -388,7 +388,7 @@ export default async function DashboardPage() {
         </div>
 
         <div className="overflow-x-auto rounded-xl border border-slate-200/80">
-          <table className="w-full text-left text-sm">
+          <table className="w-full text-left text-sm min-w-[600px]">
             <thead>
               <tr className="border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider bg-slate-50/70">
                 <th className="py-3 px-4">Tipe</th>

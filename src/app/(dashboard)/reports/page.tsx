@@ -192,7 +192,7 @@ export default async function ReportsPage({
               </span>
             </div>
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
+              <table className="w-full text-left text-sm min-w-[720px]">
                 <thead>
                   <tr className="border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase bg-slate-50">
                     <th className="py-2.5 px-3">No</th>
@@ -230,7 +230,7 @@ export default async function ReportsPage({
         {tab === "movement" && (
           <div className="space-y-4">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
+              <table className="w-full text-left text-sm min-w-[720px]">
                 <thead>
                   <tr className="border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase bg-slate-50">
                     <th className="py-2.5 px-3">Tanggal</th>
@@ -278,7 +278,7 @@ export default async function ReportsPage({
         {tab === "low" && (
           <div className="space-y-4">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
+              <table className="w-full text-left text-sm min-w-[720px]">
                 <thead>
                   <tr className="border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase bg-slate-50">
                     <th className="py-2.5 px-3">Kode</th>
@@ -319,7 +319,7 @@ export default async function ReportsPage({
         {tab === "expired" && (
           <div className="space-y-4">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
+              <table className="w-full text-left text-sm min-w-[720px]">
                 <thead>
                   <tr className="border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase bg-slate-50">
                     <th className="py-2.5 px-3">Produk</th>
@@ -370,36 +370,38 @@ export default async function ReportsPage({
                     </span>
                     <span className="text-xs text-slate-500">{op.notes || "Tanpa catatan"}</span>
                   </div>
-                  <table className="w-full text-left text-xs">
-                    <thead>
-                      <tr className="bg-slate-50 text-slate-600 font-semibold border-b">
-                        <th className="py-1.5 px-2">Produk</th>
-                        <th className="py-1.5 px-2 text-center">Stok Sistem</th>
-                        <th className="py-1.5 px-2 text-center">Stok Fisik</th>
-                        <th className="py-1.5 px-2 text-center">Selisih</th>
-                        <th className="py-1.5 px-2">Keterangan</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      {opItems.map((item) => (
-                        <tr key={item.id}>
-                          <td className="py-1.5 px-2 font-medium">{prodMap[item.productId]?.name || "-"}</td>
-                          <td className="py-1.5 px-2 text-center">{item.systemStock}</td>
-                          <td className="py-1.5 px-2 text-center font-bold">{item.physicalStock}</td>
-                          <td className="py-1.5 px-2 text-center font-bold">
-                            {item.difference === 0 ? (
-                              <span className="text-slate-400">0</span>
-                            ) : item.difference > 0 ? (
-                              <span className="text-emerald-600">+{item.difference}</span>
-                            ) : (
-                              <span className="text-red-600">{item.difference}</span>
-                            )}
-                          </td>
-                          <td className="py-1.5 px-2 text-slate-500 italic">{item.reason || "-"}</td>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs min-w-[550px]">
+                      <thead>
+                        <tr className="bg-slate-50 text-slate-600 font-semibold border-b">
+                          <th className="py-1.5 px-2">Produk</th>
+                          <th className="py-1.5 px-2 text-center">Stok Sistem</th>
+                          <th className="py-1.5 px-2 text-center">Stok Fisik</th>
+                          <th className="py-1.5 px-2 text-center">Selisih</th>
+                          <th className="py-1.5 px-2">Keterangan</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100">
+                        {opItems.map((item) => (
+                          <tr key={item.id}>
+                            <td className="py-1.5 px-2 font-medium">{prodMap[item.productId]?.name || "-"}</td>
+                            <td className="py-1.5 px-2 text-center">{item.systemStock}</td>
+                            <td className="py-1.5 px-2 text-center font-bold">{item.physicalStock}</td>
+                            <td className="py-1.5 px-2 text-center font-bold">
+                              {item.difference === 0 ? (
+                                <span className="text-slate-400">0</span>
+                              ) : item.difference > 0 ? (
+                                <span className="text-emerald-600">+{item.difference}</span>
+                              ) : (
+                                <span className="text-red-600">{item.difference}</span>
+                              )}
+                            </td>
+                            <td className="py-1.5 px-2 text-slate-500 italic">{item.reason || "-"}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               );
             })}

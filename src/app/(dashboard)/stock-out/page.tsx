@@ -69,8 +69,8 @@ export default async function StockOutPage({
 
       {/* Filter and Search Bar */}
       <div className="bg-white p-4 rounded-2xl border border-slate-200/90 shadow-sm">
-        <form method="GET" className="flex gap-2">
-          <div className="relative flex-1">
+        <form method="GET" className="flex flex-col sm:flex-row gap-2">
+          <div className="relative flex-1 min-w-0">
             <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
@@ -82,7 +82,7 @@ export default async function StockOutPage({
           </div>
           <button
             type="submit"
-            className="px-5 py-2.5 bg-slate-800 hover:bg-slate-900 text-white text-sm font-semibold rounded-xl transition cursor-pointer"
+            className="px-5 py-2.5 bg-slate-800 hover:bg-slate-900 text-white text-sm font-semibold rounded-xl transition cursor-pointer shrink-0"
           >
             Cari
           </button>
@@ -92,7 +92,7 @@ export default async function StockOutPage({
       {/* Table */}
       <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
+          <table className="w-full text-left text-sm min-w-[760px]">
             <thead>
               <tr className="border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider bg-slate-50/50">
                 <th className="py-3 px-4">Tanggal</th>

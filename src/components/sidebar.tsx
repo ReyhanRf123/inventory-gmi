@@ -19,9 +19,11 @@ import type { SessionPayload } from "@/lib/auth/session";
 
 interface SidebarProps {
   session: SessionPayload;
+  onNavigate?: () => void;
+  className?: string;
 }
 
-export function Sidebar({ session }: SidebarProps) {
+export function Sidebar({ session, onNavigate, className }: SidebarProps) {
   const pathname = usePathname();
 
   const navItems = [
@@ -52,7 +54,12 @@ export function Sidebar({ session }: SidebarProps) {
     .toUpperCase();
 
   return (
-    <aside className="w-64 bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 text-slate-300 flex flex-col shrink-0 min-h-screen border-r border-slate-800/80 shadow-xl">
+    <aside
+      className={
+        className ||
+        "w-64 bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 text-slate-300 flex flex-col shrink-0 min-h-screen border-r border-slate-800/80 shadow-xl"
+      }
+    >
       {/* Brand Header */}
       <div className="p-5 border-b border-slate-800/70 flex items-center gap-3">
         <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-700 via-blue-600 to-indigo-500 flex items-center justify-center text-white font-bold shadow-lg shadow-blue-600/30 ring-1 ring-white/20">
@@ -86,6 +93,7 @@ export function Sidebar({ session }: SidebarProps) {
                 <Link
                   key={item.href}
                   href={item.href}
+                  onClick={onNavigate}
                   className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                     isActive
                       ? "bg-blue-600 text-white shadow-lg shadow-blue-600/25 border border-blue-400/30 font-semibold"
@@ -114,6 +122,7 @@ export function Sidebar({ session }: SidebarProps) {
                   <Link
                     key={item.href}
                     href={item.href}
+                    onClick={onNavigate}
                     className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
                       isActive
                         ? "bg-blue-600 text-white shadow-lg shadow-blue-600/25 border border-blue-400/30 font-semibold"

@@ -123,7 +123,7 @@ export default async function UsersPage() {
             </h3>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="w-full text-left text-sm min-w-[580px]">
               <thead>
                 <tr className="border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase bg-slate-50/50">
                   <th className="py-3 px-4">Nama & Email</th>

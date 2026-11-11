@@ -84,7 +84,7 @@ export default async function NewOpnamePage() {
             </h3>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="w-full text-left text-sm min-w-[620px]">
               <thead>
                 <tr className="border-b border-slate-200 text-xs font-semibold text-slate-500 uppercase tracking-wider bg-slate-50/50">
                   <th className="py-3 px-4">Produk</th>
